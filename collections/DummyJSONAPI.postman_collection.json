@@ -18,6 +18,111 @@
 					"item": [
 						{
 							"name": "Get All Users",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"console.clear();"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let jsonData = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 3000ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(3000);",
+											"});",
+											"",
+											"pm.test(\"Total users is 208\", function () {",
+											"    pm.expect(jsonData.total).to.equal(208);",
+											"});",
+											"",
+											"pm.test(\"Users list is not empty\", function(){",
+											"    pm.expect(jsonData.users.length).to.be.above(0);",
+											"})",
+											"",
+											"pm.test(\"Each user has required fields\", function(){",
+											"    jsonData.users.forEach(user => {",
+											"        pm.expect(user).to.have.property('id');",
+											"        pm.expect(user).to.have.property('firstName');",
+											"        pm.expect(user).to.have.property('email');",
+											"    })",
+											"});",
+											"",
+											"let userSchema = {",
+											"    \"type\": \"object\",",
+											"    \"required\": [\"users\", \"total\", \"skip\", \"limit\"],",
+											"    \"properties\": {",
+											"        \"users\": {",
+											"            \"type\": \"array\",",
+											"            \"items\": {",
+											"                \"type\": \"object\",",
+											"                \"required\": [\"id\", \"firstName\", \"lastName\", \"email\"],",
+											"                \"properties\": {",
+											"                    \"id\": { \"type\": \"integer\" },",
+											"                    \"firstName\": { \"type\": \"string\" },",
+											"                    \"lastName\": { \"type\": \"string\" },",
+											"                    \"maidenName\": { \"type\": \"string\" },",
+											"                    \"age\": { \"type\": \"integer\" },",
+											"                    \"gender\": { \"type\": \"string\" },",
+											"                    \"email\": { \"type\": \"string\" },",
+											"                    \"phone\": { \"type\": \"string\" },",
+											"                    \"username\": { \"type\": \"string\" },",
+											"                    \"password\": { \"type\": \"string\" },",
+											"                    \"birthDate\": { \"type\": \"string\" },",
+											"                    \"image\": { \"type\": \"string\" },",
+											"                    \"bloodGroup\": { \"type\": \"string\" },",
+											"                    \"height\": { \"type\": \"number\" },",
+											"                    \"weight\": { \"type\": \"number\" },",
+											"                    \"eyeColor\": { \"type\": \"string\" },",
+											"                    \"hair\": {",
+											"                        \"type\": \"object\",",
+											"                        \"properties\": {",
+											"                            \"color\": { \"type\": \"string\" },",
+											"                            \"type\": { \"type\": \"string\" }",
+											"                        }",
+											"                    },",
+											"                    \"ip\": { \"type\": \"string\" },",
+											"                    \"address\": { \"type\": \"object\" },",
+											"                    \"macAddress\": { \"type\": \"string\" },",
+											"                    \"university\": { \"type\": \"string\" },",
+											"                    \"bank\": { \"type\": \"object\" },",
+											"                    \"company\": { \"type\": \"object\" },",
+											"                    \"ein\": { \"type\": \"string\" },",
+											"                    \"ssn\": { \"type\": \"string\" },",
+											"                    \"userAgent\": { \"type\": \"string\" },",
+											"                    \"crypto\": { \"type\": \"object\" },",
+											"                    \"role\": { \"type\": \"string\" }",
+											"                }",
+											"            }",
+											"        },",
+											"        \"total\": { \"type\": \"integer\" },",
+											"        \"skip\": { \"type\": \"integer\" },",
+											"        \"limit\": { \"type\": \"integer\" }",
+											"    }",
+											"};",
+											"",
+											"pm.test(\"Response matches the schema\", function () {",
+											"    pm.response.to.have.jsonSchema(userSchema);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
 							"request": {
 								"method": "GET",
 								"header": [],
@@ -39,7 +144,70 @@
 											"value": "10"
 										}
 									]
+								},
+								"description": "FragmentBy default you will get 30 items, use [Limit and skip](https://dummyjson.com/docs/users#users-limit_skip) to paginate through all items"
+							},
+							"response": []
+						},
+						{
+							"name": "Login User and get tokens",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"console.clear();\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let jsonData = pm.response.json();\r",
+											"pm.environment.set(\"accessToken\", jsonData.accessToken);\r",
+											"pm.environment.set(\"refreshToken\", jsonData.refreshToken);\r",
+											"\r",
+											"console.log(\"Access & Refresh Token stored as environment variables\")\r",
+											"\r",
+											"if (!jsonData.accessToken){\r",
+											"    pm.test(\"Access Token is not present\", function () {\r",
+											"        pm.expect.fail(\"No access token returned\");\r",
+											"});\r",
+											"}"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
 								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\": \"michaelw\",\r\n    \"password\": \"michaelwpass\",\r\n    \"expiresInMins\": 43200\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{baseUrl}}/users/login"
+							},
+							"response": []
+						},
+						{
+							"name": "Get current authenticated user",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": "{{baseUrl}}/user/me"
 							},
 							"response": []
 						}
