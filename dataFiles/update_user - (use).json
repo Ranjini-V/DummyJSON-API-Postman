@@ -1,0 +1,24 @@
+[
+  {
+    "id": 1, 
+    "firstName": "UpdatedRV",
+    "lastName": "Williams",
+    "maidenName": "",
+    "age": 36,
+    "gender": "female",
+    "email": "rv@test.com",
+    "phone": "+49 258-627-6644",
+    "username": "michaelw",
+    "password": "michaelwpass",
+    "birthDate": "1989-8-10",
+    "image": "",
+    "bloodGroup": "B+",
+    "height": 186.22,
+    "weight": 76.32,
+    "eyeColor": "Red",
+    "ein": "912-602",
+    "ssn": "108-953-962",
+    "userAgent": "Postman",
+    "role": "admin"
+  }
+]
